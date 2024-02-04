@@ -4,7 +4,7 @@ from libqtile import bar, layout, hook, qtile
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
 from qtile_extras import widget 
-from qtile_extras.widget.decorations import RectDecoration
+from qtile_extras.widget.decorations import RectDecoration, PowerLineDecoration
 import os
 import subprocess
 
@@ -161,56 +161,53 @@ layouts = [
 
 decor = {
     "decorations": [
-        RectDecoration(colour=colors["black"], radius=10, filled=True, padding_y=5)
+#        RectDecoration(colour=colors["blue"], radius=5, filled=False, padding_y=10)
+        PowerLineDecoration(path='forward_slash'),
     ],
 }
 
 widget_defaults = dict(
-    **decor,
-    background=colors["blue"],
+    background=colors["black"],
     foreground=colors["white"],
     font="sans",
     fontsize=12,
-    padding=3,
+    padding=5,
+    decorations = [
+        PowerLineDecoration(path='forward_slash'),
+    ],
 )
 extension_defaults = widget_defaults.copy()
 
+wsep = widget.Sep(
+    decorations=[],
+    padding=10,
+    linewidth=0,
+)
 
 
 modded_widgets = [
+    wsep,
     widget.CPU(
         background=colors["blue"],
-        foreground=colors["white"],
-        format='cpu {load_percent}%',
+        format='{load_percent}%',
         fontsize=16,
-        decorations = [
-        RectDecoration(colour=colors["black"], radius=10, filled=True, padding_y=5)
-        ],
     ),
     widget.Memory(
+        background=colors["bblue"],
         fontsize=16,
         measure_mem='G',
-        format='ram {MemUsed: .2f} GB',
-    ),
-    widget.Sep(
-        background=colors["black"],
-        padding=10,
-        linewidth=0,
+        format='{MemUsed: .2f} GB',
     ),
     widget.CurrentLayout(
+        background=colors["blue"],
         fontsize=15,
     ),
-    widget.CurrentLayoutIcon(
-        scale=0.6,
-    ),
-    widget.Sep(
-        background=colors["black"],
-        padding=10,
-        linewidth=0,
-    ),
-    widget.Prompt(),
+    # widget.CurrentLayoutIcon(
+    #     scale=0.6,
+    # ),
+    wsep,
     widget.Spacer(
-        background=colors["black"],
+        decorations=[],
     ),
     widget.GroupBox(
         active=colors["bblue"],
@@ -226,21 +223,23 @@ modded_widgets = [
 
         blockwidth=2,
         margin_y=5,
+        decorations=[],
     ),
     widget.Spacer(
-        background=colors["black"],
+        decorations=[],
     ),
     widget.Systray(
-        background=colors["black"],
+        decorations=[],
         icon_size=30,
         padding=5,
     ),
     widget.Sep(
-        background=colors["black"],
+        #decorations=[],
         padding=10,
         linewidth=0,
     ),
-    widget.PulseVolumeExtra(
+    widget.PulseVolume(
+        background=colors["blue"],
         fontsize=16,
         mouse_callbacks={'Button3': lambda: qtile.cmd_spawn("pavucontrol")},
     ),
@@ -251,17 +250,8 @@ modded_widgets = [
 #        fontsize=16,
 #        mouse_callbacks={'Button3': lambda: qtile.cmd_spawn("pavucontrol")},
 #    ),
-    widget.Sep(
-        background=colors["black"],
-        padding=10,
-        linewidth=0,
-    ),
-    widget.Sep(
-        background=colors["black"],
-        padding=6,
-        linewidth=0,
-    ),
     widget.Clock(
+        decorations=[],
         background=colors["blue"],
         foreground=colors["white"],
         fontsize=16,
@@ -336,4 +326,5 @@ wl_input_rules = None
 #
 # We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
 # java that happens to be on java's whitelist.
-wmname = "LG3D"
+# wmname = "LG3D"
+wmname = "QTile"
