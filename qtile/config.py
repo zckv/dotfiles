@@ -202,6 +202,7 @@ modded_widgets = [
         background=colors["blue"],
         fontsize=15,
     ),
+    widget.Prompt(),
     # widget.CurrentLayoutIcon(
     #     scale=0.6,
     # ),
@@ -229,14 +230,8 @@ modded_widgets = [
         decorations=[],
     ),
     widget.Systray(
-        decorations=[],
         icon_size=30,
         padding=5,
-    ),
-    widget.Sep(
-        #decorations=[],
-        padding=10,
-        linewidth=0,
     ),
     widget.PulseVolume(
         background=colors["blue"],
