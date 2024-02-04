@@ -1,32 +1,10 @@
-# Copyright (c) 2010 Aldo Cortesi
-# Copyright (c) 2010, 2014 dequis
-# Copyright (c) 2012 Randall Ma
-# Copyright (c) 2012-2014 Tycho Andersen
-# Copyright (c) 2012 Craig Barnes
-# Copyright (c) 2013 horsik
-# Copyright (c) 2013 Tao Sauvage
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+#!/usr/bin/python
 
-from libqtile import bar, layout, widget, hook
+from libqtile import bar, layout, hook, qtile
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
+from qtile_extras import widget 
+from qtile_extras.widget.decorations import RectDecoration
 import os
 import subprocess
 
@@ -34,7 +12,7 @@ mod = "mod4"
 terminal = "kitty"
 
 theme_argonaut = [ 
-    '#232323',    # Black (Host)
+    '#23232300',    # Black (Host)
     '#FF000F',    # Red (Syntax string)
     '#8CE10B',    # Green (Command)
     '#FFB900',    # Yellow (Command second)
@@ -51,6 +29,39 @@ theme_argonaut = [
     '#67FFF0',    # Bright Cyan
     '#FFFFFF',    # Bright White
 ]
+
+colors = {
+    "black": theme_argonaut[0], 
+    "red": theme_argonaut[1], 
+    "green": theme_argonaut[2], 
+    "yellow": theme_argonaut[3], 
+    "blue": theme_argonaut[4], 
+    "magenta": theme_argonaut[5], 
+    "cyan": theme_argonaut[6], 
+    "white": theme_argonaut[7], 
+    "bblack": theme_argonaut[8], 
+    "bred": theme_argonaut[9], 
+    "bgreen": theme_argonaut[10], 
+    "byellow": theme_argonaut[11], 
+    "bblue": theme_argonaut[12], 
+    "bmagenta": theme_argonaut[13], 
+    "bcyan": theme_argonaut[14], 
+    "bwhite": theme_argonaut[15], 
+}
+
+#[
+#        ["#00000000", "#00000000", "#00000000"],     # color 0
+#        ["#2e3440", "#2e3440", "#2e3440"], # color 1
+#        # ["#32333C", "#32333C", "#32333C"], # color 1
+#        ["#65bdd8", "#65bdd8", "#65bdd8"], # color 2
+#        ["#bc7cf7", "#a269cf", "#bc7cf7"], # color 3
+#        ["#aed1dc", "#98B7C0", "#aed1dc"], # color 4
+#        ["#f3f4f5", "#f3f4f5", "#f3f4f5"], # color 5
+#        ["#bb94cc", "#AB87BB", "#bb94cc"], # color 6
+#        ["#9859B3", "#8455A8", "#9859B3"], # color 7
+#        ["#744B94", "#694486", "#744B94"], # color 8
+#        ["#0ee9af", "#0ee9af", "#0ee9af"] # color 9
+#]
 
 keys = [
     # A list of available commands that can be bound to keys can be found
@@ -83,7 +94,7 @@ keys = [
         "Return",
         lazy.layout.toggle_split(),
         desc="Toggle between split and unsplit sides of stack",
-    ),
+        ),
     Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
     # Toggle between different layouts as defined below
     Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
@@ -98,6 +109,10 @@ keys = [
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
     Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
     Key([mod], "r", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
+
+    Key([], "XF86AudioMute", lazy.spawn("pamixer -t")),
+    Key([], "XF86AudioLowerVolume", lazy.spawn("pamixer -d 5")),
+    Key([], "XF86AudioRaiseVolume", lazy.spawn("pamixer -i 5")),
 ]
 
 groups = [Group(i) for i in "123456789"]
@@ -133,7 +148,7 @@ layouts = [
     layout.Max(),
     # Try more layouts by unleashing below layouts.
     # layout.Stack(num_stacks=2),
-    # layout.Bsp(),
+    layout.Bsp(),
     # layout.Matrix(),
     # layout.MonadTall(),
     # layout.MonadWide(),
@@ -144,131 +159,113 @@ layouts = [
     # layout.Zoomy(),
 ]
 
+decor = {
+    "decorations": [
+        RectDecoration(colour=colors["black"], radius=10, filled=True, padding_y=5)
+    ],
+}
+
 widget_defaults = dict(
+    **decor,
+    background=colors["blue"],
+    foreground=colors["white"],
     font="sans",
     fontsize=12,
     padding=3,
 )
 extension_defaults = widget_defaults.copy()
 
-# Define Theme colors
-colors =  [
-        ["#00000000", "#00000000", "#00000000"],     # color 0
-        ["#2e3440", "#2e3440", "#2e3440"], # color 1
-        # ["#32333C", "#32333C", "#32333C"], # color 1
-        ["#65bdd8", "#65bdd8", "#65bdd8"], # color 2
-        ["#bc7cf7", "#a269cf", "#bc7cf7"], # color 3
-        ["#aed1dc", "#98B7C0", "#aed1dc"], # color 4
-        ["#f3f4f5", "#f3f4f5", "#f3f4f5"], # color 5
-        ["#bb94cc", "#AB87BB", "#bb94cc"], # color 6
-        ["#9859B3", "#8455A8", "#9859B3"], # color 7
-        ["#744B94", "#694486", "#744B94"], # color 8
-        ["#0ee9af", "#0ee9af", "#0ee9af"] # color 9
-]
-
-font1 = "Free Mono"
-font2 = "Free Mono"
 
 
 modded_widgets = [
-    widget.Sep(
-        background=colors[8],
-        padding=15,
-        linewidth=0,
-    ),
-    widget.Clock(
-        font=font2,
+    widget.CPU(
+        background=colors["blue"],
+        foreground=colors["white"],
+        format='cpu {load_percent}%',
         fontsize=16,
-        foreground=colors[5],
-        background=colors[8],
-        format='%d %b | %A'
-    ),
-    widget.Sep(
-        background=colors[0],
-        padding=10,
-        linewidth=0,
+        decorations = [
+        RectDecoration(colour=colors["black"], radius=10, filled=True, padding_y=5)
+        ],
     ),
     widget.Memory(
-        background=colors[7],
-        foreground=colors[5],
-        font=font2,
         fontsize=16,
         measure_mem='G',
-        format='{MemUsed: .2f} GB',
+        format='ram {MemUsed: .2f} GB',
     ),
     widget.Sep(
-        background=colors[0],
+        background=colors["black"],
         padding=10,
         linewidth=0,
     ),
     widget.CurrentLayout(
-        background=colors[3],
-        foreground=colors[5],
-        font=font2,
         fontsize=15,
     ),
     widget.CurrentLayoutIcon(
-        custom_icon_paths=[os.path.expanduser("~/.config/qtile-gentoo/icons")],
-        scale=0.45,
-        padding=0,
-        background=colors[0],
+        scale=0.6,
+    ),
+    widget.Sep(
+        background=colors["black"],
+        padding=10,
+        linewidth=0,
     ),
     widget.Prompt(),
-    widget.Spacer(),
+    widget.Spacer(
+        background=colors["black"],
+    ),
     widget.GroupBox(
-        font=font1,
+        active=colors["bblue"],
+        background=colors["black"],
+        block_highlight_text_color=colors["blue"],
+        disable_drag=True,
         fontsize=14,
-        active=colors[4],
-        inactive=colors[1],
+        inactive=colors["bblack"],
         rounded=True,
-        highlight_color=colors[8],
-        highlight_method="line",
-        this_current_screen_border=colors[8],
-        block_highlight_text_color=colors[5],
+        highlight_color=colors["white"],
+        # highlight_method="line",
+        this_current_screen_border=colors["white"],
+
         blockwidth=2,
         margin_y=5,
     ),
-    widget.Spacer(),
+    widget.Spacer(
+        background=colors["black"],
+    ),
     widget.Systray(
-        background=colors[0],
-        foreground=colors[8],
-        icon_size=20,
-        padding=4,
+        background=colors["black"],
+        icon_size=30,
+        padding=5,
     ),
     widget.Sep(
-        background=colors[0],
+        background=colors["black"],
         padding=10,
         linewidth=0,
     ),
-    widget.PulseVolume(
-        background=colors[4],
-        foreground=colors[5],
-        font=font2,
+    widget.PulseVolumeExtra(
         fontsize=16,
+        mouse_callbacks={'Button3': lambda: qtile.cmd_spawn("pavucontrol")},
     ),
+#    widget.PulseVolume(
+#        background=colors["cyan"],
+#        emoji=True,
+#        foreground=colors["white"],
+#        fontsize=16,
+#        mouse_callbacks={'Button3': lambda: qtile.cmd_spawn("pavucontrol")},
+#    ),
     widget.Sep(
-        background=colors[0],
+        background=colors["black"],
         padding=10,
         linewidth=0,
     ),
-    widget.CPU(
-        background=colors[3],
-        foreground=colors[5],
-        format=' {load_percent}%',
-        font='novamono for powerline bold',
-        fontsize=16
-    ),
     widget.Sep(
-        background=colors[3],
+        background=colors["black"],
         padding=6,
         linewidth=0,
     ),
     widget.Clock(
-        background=colors[8],
-        foreground=colors[5],
-        font=font2,
+        background=colors["blue"],
+        foreground=colors["white"],
         fontsize=16,
-        format='%I:%M %p',
+        format='%H:%M %d/%m/%y',
     ),
 ]
 
